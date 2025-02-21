@@ -1,0 +1,93 @@
+plugins {
+    id 'java'
+}
+
+group = 'org.angel'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation group: 'org.junit.vintage', name: 'junit-vintage-engine', version: '5.9.1'
+
+    implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '4.13.0'
+    implementation 'io.github.bonigarcia:webdrivermanager:5.9.3'
+
+    testImplementation group: 'io.cucumber', name: 'cucumber-junit-platform-engine', version: '7.21.1'
+    testImplementation 'io.cucumber:cucumber-java:7.14.0'
+    testImplementation group: 'io.cucumber', name: 'cucumber-junit', version: '7.21.1'
+
+    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.3.1'
+    implementation group: 'io.rest-assured', name: 'json-schema-validator', version: '5.3.1'
+    implementation 'org.json:json:20210307'
+}
+
+//test {
+//    useJUnitPlatform()
+//}
+
+configurations {
+    cucumberRunTime {
+        extendsFrom testImplementation
+    }
+}
+
+def tags = (findProperty('tags') == null) ? 'not @exclude' : findProperty('tags') + ' and not @exclude'
+
+tasks.register('cucumber') {
+    dependsOn assemble, testClasses
+    doLast {
+        javaexec {
+            main = "io.cucumber.core.cli.Main"
+            classpath = configurations.cucumberRunTime + sourceSets.main.output + sourceSets.test.output
+            args = [
+                    '--plugin', 'html:reports/test-report.html',
+                    '--plugin', 'json:reports/test-report.json',
+                    '--plugin', 'pretty',
+                    '--glue', 'com.angel',
+                    '--tags', "${tags}",
+                    'src/test/resources'
+            ]
+        }
+    }
+}
+
+tasks.register("api") {
+    dependsOn assemble, testClasses
+    doLast {
+        javaexec {
+            main = "io.cucumber.core.cli.Main"
+            classpath = configurations.cucumberRunTime + sourceSets.main.output + sourceSets.test.output
+            args = [
+                    '--plugin', 'html:reports/test-report-api.html',
+                    '--plugin', 'json:reports/test-report-api.json',
+                    '--plugin', 'pretty',
+                    '--glue', 'com.angel.api',
+                    '--tags', "@api",
+                    'src/test/resources/api'
+            ]
+        }
+    }
+}
+
+tasks.register("web") {
+    dependsOn assemble, testClasses
+    doLast {
+        javaexec {
+            main = "io.cucumber.core.cli.Main"
+            classpath = configurations.cucumberRunTime + sourceSets.main.output + sourceSets.test.output
+            args = [
+                    '--plugin', 'html:reports/test-report-web.html',
+                    '--plugin', 'json:reports/test-report-web.json',
+                    '--plugin', 'pretty',
+                    '--glue', 'com.angel.web',
+                    '--tags', "@web",
+                    'src/test/resources/web'
+            ]
+        }
+    }
+}
