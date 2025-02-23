@@ -41,14 +41,15 @@ Feature: Test Automation Web Demo Blaze Feature
     And user click sign up button
     Then Sign up successfully and display message "Please fill out Username and Password."
 
+    # Change username and password
   @web
   Scenario: Test web login normal
     Given user go to Product Store page "https://www.demoblaze.com/"
     And user click menu Log in
-    When user input username "angel123"
-    And user input password "Test123"
+    When user input username "admin"
+    And user input password "admin"
     And user click login button
-    Then User login successfully with welcome message "Welcome angel123"
+    Then User login successfully with welcome message "Welcome admin"
 
   @web
   Scenario: Test web logout
@@ -67,6 +68,7 @@ Feature: Test Automation Web Demo Blaze Feature
     And user click button Send Message
     Then Send Message successfully and display message "Thanks for the message!!"
 
+    # failed because The media could not be loaded, either because the server or network failed or because the format is not supported.
   @web
   Scenario: Test web Play Video in About us Menu
     Given user go to Product Store page "https://www.demoblaze.com/"
